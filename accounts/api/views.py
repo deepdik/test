@@ -18,6 +18,7 @@ from .serializers import (
 		ChangePasswordSerializer,
 	)
 from .permissions import IsAuthenticatedOrCreate
+from meenfee.models import UserOtherInfo
 
 User = get_user_model()
 
@@ -111,6 +112,66 @@ class GoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     authentication_classes = [JSONWebTokenAuthentication]
 
+
+# To start OTP send and varify views install (pip install authy) 
+
+from authy.api import AuthyApiClient
+authy_api = AuthyApiClient('k9W1atQ5WTpTN6sBhF2brLXP9FWP1dm1')
+
+class OtpGenerateAPIView(APIView):
+	'''
+	Otp generate apiview
+	'''
+	def post(self,request):
+		phone_number = request.data['phone_number']
+		country_code = request.data['country_code']
+		if phone_number and country_code:
+			usr_qs = UserOtherInfo.objects.filter(phone=phone_number)
+			if usr_qs.exists() and usr_qs.count() == 1:
+				return Response({
+					'success':False,
+					'msg':'user with this phone number already exist'},
+					status=HTTP_400_BAD_REQUEST
+					)
+			else:
+				request = authy_api.phones.verification_start(phone_number, country_code, 
+					via='sms', locale='en')
+				if request.content['success'] ==True:
+					return Response({
+					'success':True,
+					'msg':request.content['message']},
+					status=HTTP_200_OK)
+				else:
+					return Response({
+					'success':False,
+					'msg':request.content['message']},
+					status=HTTP_400_BAD_REQUEST)
+		 
+		else:
+			return Response('provide phone_number and country_code',status=HTTP_400_BAD_REQUEST)
+
+class OtpVarifyAPIView(APIView):
+	def post(self,request):
+		'''
+		to check varification code 
+		'''
+		phone_number = request.data['phone_number']
+		country_code = request.data['country_code']
+		verification_code = request.data['verification_code']
+		if phone_number and country_code and verification_code:
+			check = authy_api.phones.verification_check(phone_number, country_code, verification_code)
+			if check.ok()==True:
+				return Response({
+					'success':True,
+					'msg':check.content['message']},
+					status=HTTP_200_OK)
+			return Response({
+					'success':False,
+					'msg':check.content['message']},
+					status=HTTP_400_BAD_REQUEST)
+		 
+
+		return Response('provide phone_number, verification_code and country_code',status=HTTP_400_BAD_REQUEST)
 
 
 

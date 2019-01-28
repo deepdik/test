@@ -1,13 +1,6 @@
 from django.urls import path
 
-from .views import (
-		UserCreateAPIView,
-		UserLoginAPIView,
-		ChangePasswordAPIView,
-		PasswordResetView,
-		FacebookLoginView,
-		GoogleLoginView,
-	)
+from .views import *
 
 urlpatterns = [
 	path('register/',UserCreateAPIView.as_view(),name="register"),
@@ -18,4 +11,9 @@ urlpatterns = [
     path('rest-auth/google/', GoogleLoginView.as_view(), name='gl_login'), #facebooklogin
 
     path('rest-auth/facebook/', FacebookLoginView.as_view(), name='fb_login'), #facebooklogin
+    path('otp-generate',OtpGenerateAPIView.as_view(),name="OtpGenerateAPIView"),
+    path('otp-varify',OtpVarifyAPIView.as_view(),name="OtpVarifyAPIView"),
+
+
+
 ]
