@@ -9,7 +9,7 @@ from rest_framework.serializers import(
      SerializerMethodField,
      Serializer,
      )
-
+from meenfee.models import UserOtherInfo
 from django.contrib.auth import get_user_model
 
 from rest_framework_jwt.settings import api_settings
@@ -50,22 +50,33 @@ class UserDetailSerializer(ModelSerializer):
 
 class UserCreateSerializer(ModelSerializer):
 #    token = CharField(allow_blank=True, read_only=True)
-    email = EmailField()
-    username = CharField()
+    firstname       = CharField()
+    lastname        = CharField() 
+    email           = EmailField()
+    phonenumber     = CharField()
+    idcard          = CharField(allow_blank=True)
+    usertype        = CharField()
     class Meta:
         model = User
-        fields = ['username', 'email','password']
+        fields = ['firstname', 'lastname','email', 'password', 'phonenumber', 'idcard','usertype']
         extra_kwargs = {'password': {'write_only': True}}
 
-    def validate_username(self,username):
-        pattern = re.compile(r"^[A-Za-z0-9\.\-\_]{4,}$")
-        if pattern.match(username):
-            user_qs = User.objects.filter(username__iexact=username)
-            if user_qs.exists():
-                raise ValidationError('User with this user name already exists')
-            return username
-        else:
-            raise ValidationError('Please correct the format of username')
+    # def validate_username(self,username):
+    #     pattern = re.compile(r"^[A-Za-z0-9\.\-\_]{4,}$")
+    #     if pattern.match(username):
+    #         user_qs = User.objects.filter(username__iexact=username)
+    #         if user_qs.exists():
+    #             raise ValidationError('User with this user name already exists')
+    #         return username
+    #     else:
+    #         raise ValidationError('Please correct the format of username')
+
+    def validate_phonenumber(self, phonenumber):
+        user_qs = UserOtherInfo.objects.filter(phone__iexact=phonenumber)
+        if user_qs.exists():
+            raise ValidationError('User with this phonenumber already exists')
+        return phonenumber
+
 
 
     def validate_email(self, email):
@@ -92,25 +103,36 @@ class UserCreateSerializer(ModelSerializer):
         return password
 
     def create(self, validatedData):
-        username = validatedData['username']
         email = validatedData['email']
         password = validatedData['password']
-        userObj = User(username=username, email=email)
+        firstname = validatedData['firstname']
+        lastname = validatedData['lastname']
+        phonenumber = validatedData['phonenumber']
+        idcard = validatedData['idcard']
+        usertype = validatedData['usertype']
+        username = firstname+phonenumber
+        userObj = User(email=email,username=username,first_name=firstname,
+            last_name=lastname
+            )
+
         userObj.set_password(password)
-        userObj.is_active = False
         userObj.save()
-        subject = 'Activate Your Meenfee Account'
-        message = render_to_string('account_activation_email.html', {
-            'user': userObj,
-            'domain':'localhost:8000',
-            'uid': urlsafe_base64_encode(force_bytes(userObj.pk)).decode(),
-            'token': account_activation_token.make_token(userObj),
-        })
-        userObj.email_user(subject, message)
+        UserOtherInfo.objects.create(user=userObj, phone = phonenumber,
+            idcard=idcard,isphvarified=True, usertype=usertype)
+
+
+        # subject = 'Activate Your Meenfee Account'
+        # message = render_to_string('account_activation_email.html', {
+        #     'user': userObj,
+        #     'domain':'localhost:8000',
+        #     'uid': urlsafe_base64_encode(force_bytes(userObj.pk)).decode(),
+        #     'token': account_activation_token.make_token(userObj),
+        # })
+        # userObj.email_user(subject, message)
 
         # payload = jwt_payload_handler(userObj)
         # token = jwt_encode_handler(payload)
-        validatedData['username'] = userObj.username
+        
         # validatedData['token'] = token
         return validatedData
 

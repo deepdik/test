@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'meenfee',
     'accounts',
     'rest_framework',
+ 
+
   
     'rest_auth',
     'rest_auth.registration',
