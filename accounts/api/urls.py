@@ -14,6 +14,4 @@ urlpatterns = [
     path('otp-generate',OtpGenerateAPIView.as_view(),name="OtpGenerateAPIView"),
     path('otp-varify',OtpVarifyAPIView.as_view(),name="OtpVarifyAPIView"),
 
-
-
 ]

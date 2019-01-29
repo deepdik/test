@@ -27,7 +27,9 @@ DEBUG = True
 SITE_ID = 1
 ALLOWED_HOSTS = []
 REST_USE_JWT = True
-
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED =True
+SOCIALACCOUNT_EMAIL_REQUIRED =ACCOUNT_EMAIL_REQUIRED
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,7 +42,7 @@ INSTALLED_APPS = [
     'meenfee',
     'accounts',
     'rest_framework',
- 
+
 
   
     'rest_auth',

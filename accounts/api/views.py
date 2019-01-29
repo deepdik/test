@@ -40,6 +40,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 #END-------------------------------
 
 from rest_framework_jwt.authentication import  JSONWebTokenAuthentication
+
 class UserCreateAPIView(CreateAPIView):
 	querset = User.objects.all()
 	serializer_class = UserCreateSerializer
@@ -102,15 +103,21 @@ class PasswordResetView(GenericAPIView):
             {"success": "Password reset e-mail has been sent."},
             status=status.HTTP_200_OK
         )
+# social login start
+
+from .socialserializer import  ModifiedSocialLoginSerializer
 
 class FacebookLoginView(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
-    authentication_classes = [JSONWebTokenAuthentication]
+    serializer_class=ModifiedSocialLoginSerializer
+    # authentication_classes = [JSONWebTokenAuthentication]
 
 
 class GoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    authentication_classes = [JSONWebTokenAuthentication]
+    serializer_class=ModifiedSocialLoginSerializer
+
+    # authentication_classes = [JSONWebTokenAuthentication]
 
 
 # To start OTP send and varify views install (pip install authy) 

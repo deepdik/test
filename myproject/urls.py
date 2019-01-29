@@ -37,7 +37,11 @@ urlpatterns = [
     # url(r'^firebase-messaging-sw.js', ServiceWorkerView.as_view(), name='service_worker')# web firebase pushnotification
       
 ]
- 
+
+
+urlpatterns += [
+    url(r'',TemplateView.as_view(template_name='social.html')),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
