@@ -12,6 +12,6 @@ urlpatterns = [
 
     path('rest-auth/facebook/', FacebookLoginView.as_view(), name='fb_login'), #facebooklogin
     path('otp-generate',OtpGenerateAPIView.as_view(),name="OtpGenerateAPIView"),
-    path('otp-varify',OtpVarifyAPIView.as_view(),name="OtpVarifyAPIView"),
+    path('otp-verify',OtpVarifyAPIView.as_view(),name="OtpVarifyAPIView"),
 
 ]

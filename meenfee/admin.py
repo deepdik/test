@@ -21,17 +21,15 @@ admin.site.register(User, UserAdmin)
 
 
 
+class ServiceProviderAvailabilityInline(admin.TabularInline):
+    model = ServiceProviderAvailability
+    extra = 1
+    verbose_name_plural = 'Service Provider Availability'
+
+class ServiceAdmin(admin.ModelAdmin):
+    inlines = (ServiceProviderAvailabilityInline,)
 
 
-class MeenfeeAdmin(admin.ModelAdmin):
-	list_display = ('city',)
-	search_fields = ('city',)
-	
-class ServiceproviderAdmin(admin.ModelAdmin):
-	list_display = ('firstname',)
-	search_fields = ('firstname',)
-	
-admin.site.register(ServiceProvider,ServiceproviderAdmin)
-admin.site.register(City,MeenfeeAdmin)
-admin.site.register([Category,SubCategory])
+admin.site.register(Service,ServiceAdmin)
+admin.site.register([Category,SubCategory,City])
 

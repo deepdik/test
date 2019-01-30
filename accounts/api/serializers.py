@@ -54,7 +54,7 @@ class UserCreateSerializer(ModelSerializer):
     lastname        = CharField() 
     email           = EmailField()
     phonenumber     = CharField()
-    idcard          = CharField()
+    idcard          = CharField(allow_blank=True)
     usertype        = CharField()
     class Meta:
         model = User
