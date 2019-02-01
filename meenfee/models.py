@@ -144,51 +144,54 @@ class RowBooking(models.Model):
     # check it appointment timimg is one or can be more than one
     # if one then add a field like below
 
-    appointment_date           = models.DateField()
-    appointment_time_from      = models.TimeField()
-    appointment_time_to        = models.TimeField()
+    appointment_date            = models.DateField()
+    appointment_time_from       = models.TimeField()
+    appointment_time_to         = models.TimeField()
 
     # otherwise make other model like ---ServiceProviderAvailability ----
     
-    created                    = models.DateTimeField(auto_now_add=True)
+    created                     = models.DateTimeField(auto_now_add=True)
     # response by provider and requester     
-    isacceptedbyprovider       = models.BooleanField(default=False, help_text='accepted by provider on time') 
-    isacceptedbyprovider_exp   = models.BooleanField(default=False, help_text='accepted by provider after 5 min')
-    accepted_time              = models.DateTimeField(null=True,blank=True)
-    ispaymentadd               = models.BooleanField(default=False)
-    paymentaddtime             = models.DateTimeField(blank=True,null=True)
-
+    isacceptedbyprovider        = models.BooleanField(default=False, help_text='accepted by provider on time') 
+    isacceptedbyprovider_exp    = models.BooleanField(default=False, help_text='accepted by provider after 5 min')
+    accepted_time               = models.DateTimeField(null=True,blank=True)
+    ispaymentadd                = models.BooleanField(default=False)
+    paymentaddtime              = models.DateTimeField(blank=True,null=True)
+    isbookingcompleted          = models.BooleanField(default=False)
     def __str__(self):
         return str(self.id)
+
+
+
+    class Meta:
+        verbose_name = 'Booking'
+        verbose_name_plural = "Bookings"
 
 
 class LiveBooking(models.Model):
     '''
     when requester add payment method then booking  will come in this section
     '''
-    rowbooking_id               = models.ForeignKey(RowBooking ,on_delete=models.DO_NOTHING)
-    # requester                   = models.ForeignKey(User , on_delete=models.DO_NOTHING)
+    rowbooking_id               = models.OneToOneField(RowBooking ,on_delete=models.DO_NOTHING)
+    requester                   = models.ForeignKey(User , on_delete=models.DO_NOTHING)
     # provider                    = models.ForeignKey(User , on_delete=models.DO_NOTHING)
     
 
     '''
-    status 
-    1 = card added (live)
-    2 = ReScheduled Appointments (in process)
-    3 = task completed by provider not approval by requester
-    4 = task completed approved by both
-    
-    # extra stuff 
-    on cancel appoint delete model from here
+    status code 
 
+    1   = card added (live)
+    2   = ReScheduled Appointments (in process)
+    3   = on cancelling appointment delete model from here
+    4   = completed
 
     '''
 
-    booking_status     = models.CharField(max_length=5, blank=True,null=True)
+    booking_status     = models.CharField(max_length=2, blank=True,null=True)
 
 
 
-class ReScheduledAppointments(models.Model):
+class ReScheduledAppointment(models.Model):
     rowbooking_id           = models.ForeignKey(RowBooking ,on_delete=models.DO_NOTHING)
     re_scheduled_by         = models.ForeignKey(User,on_delete=models.CASCADE)
     re_scheduled_date       = models.DateTimeField(auto_now_add=True)
@@ -204,7 +207,7 @@ class ReScheduledAppointments(models.Model):
         verbose_name_plural = "Re-Scheduled Appointments"
 
 
-class notification(models.Model):
+class Notification(models.Model):
     notification_from       = models.ForeignKey(User ,on_delete=models.DO_NOTHING,related_name='notification_from')
     notification_to         = models.ForeignKey(User ,on_delete=models.DO_NOTHING,related_name='notification_to')
     isseen_by_opposite      = models.BooleanField(default=False)
@@ -213,18 +216,13 @@ class notification(models.Model):
     isseen_opposite         = models.BooleanField(default=False)
     seen_time               = models.DateTimeField(blank=True,null=True)
 
+    # notification text and redirect from notification to action place is remaining
 
     def __int__(self):
-        return self.rowbooking_id
+        return self.notification_from
 
     class Meta:
-        verbose_name_plural = "Re-Scheduled Appointments"
-
-
-
-
-
-
+        verbose_name_plural = "Notification"
 
 
 class CanceledBooking(models.Model):
@@ -236,14 +234,32 @@ class CanceledBooking(models.Model):
     cancel_date        = models.DateTimeField(auto_now_add=True)
 
 
-    
-
-
     def __int__(self):
         return self.rowbooking_id
 
     class Meta:
         verbose_name_plural = "Canceled Booking"
+
+
+class CompletedBooking(models.Model):
+    '''
+    Completed Booking will come here
+    '''
+    rowbooking_id             = models.OneToOneField(RowBooking ,on_delete=models.DO_NOTHING)
+    confirmed_by_provider     = models.BooleanField(default=False)
+    confirmed_by_requester    = models.BooleanField(default=False)
+    
+    
+    # TO DO model for when provider say service completed and requester say not completed
+
+    def __int__(self):
+        return self.rowbooking_id
+
+    class Meta:
+        verbose_name_plural = "Completed Booking"
+
+
+
 
 class PaymentMethod(models.Model):
     '''

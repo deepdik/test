@@ -140,11 +140,11 @@ class UserCreateSerializer(ModelSerializer):
 class UserLoginSerializer(ModelSerializer):
 
     token = CharField(allow_blank=True, read_only=True)
-    username = CharField()
+    email = CharField()
 
     def validate(self, data):
         userObj = None
-        username = data['username']
+        username = data['email']
         password = data['password']
          
         userA =User.objects.filter(username__iexact=username)
@@ -168,7 +168,7 @@ class UserLoginSerializer(ModelSerializer):
         raise ValidationError('Incorrect Password')
     class Meta:
         model = User
-        fields = ['token', 'username','password']
+        fields = ['token', 'email','password']
 
         extra_kwargs = {'password': {'write_only': True}}
 

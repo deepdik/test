@@ -6,8 +6,10 @@ from . import views
 
 
 urlpatterns = [
-    path('ongoingbookings', views.OngoingBookingsListAPIView.as_view(),name="CategoriesCreateDestination"),
-   	path('cancelbooking', views.CancelAppointment.as_view(),name="CancelAppointment"),
+    path('ongoingbookings', views.OngoingBookingsListAPIView.as_view(),name="OngoingBookings"),
+   	path('cancelbooking', views.CancelAppointmentAPIView.as_view(),name="CancelAppointment"),
+   	path('re-schedule-appointment', views.ReScheduleAppointmentAPIView.as_view(),name="ReScheduleAppointment"),
+   	path('service-is-completed', views.CompletedServiceAPIView.as_view(),name="CompletedService"),
 
 ]
 
