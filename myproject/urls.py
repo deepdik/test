@@ -20,16 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts.views import activate
 from django.views.generic.base import TemplateView
-from rest_framework_jwt.views import (
-    refresh_jwt_token,
-    obtain_jwt_token,
-    verify_jwt_token
-    )
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    url('admin/', admin.site.urls),
     url(r'^api/v1/users/',include(('accounts.api.urls','accounts'),namespace="users-api")),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',activate, name='activate'),#Email Activation
+    url(r'^api/v1/meenfee/',include(('meenfee.api.urls','meenfee'),namespace="meenfee-api")),
 
     url('^', include('django.contrib.auth.urls')), #email varification
     url(r'^rest-auth/', include('rest_auth.urls')), #social login

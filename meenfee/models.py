@@ -65,7 +65,7 @@ class Service(models.Model):
     completed_task          = models.PositiveIntegerField(default=0)
     avg_rating              = models.FloatField(default=0.0)
 
-    # check it --divakar-- type of tasker and response time(i think it should be some choices field)
+    # check it  type of tasker and response time(i think it should be some choices field)
     type_of_tasker          = models.CharField(max_length=15 ,blank=True,null=True)
     response_within         = models.CharField(max_length=15 ,blank=True,null=True)
 
@@ -74,7 +74,7 @@ class Service(models.Model):
     created                 = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.first_name
+        return self.user.first_name +'-'+self.category.category
 
     class Meta:
         verbose_name_plural = "Services"
@@ -133,7 +133,6 @@ class RowBooking(models.Model):
     To save row booking request given by requester
 
     '''
-    provider                    = models.ForeignKey(User , on_delete=models.CASCADE,related_name="provider")
     requester                   = models.ForeignKey(User , on_delete=models.CASCADE,related_name="requester")
     service                     = models.ForeignKey(Service , on_delete=models.CASCADE)
     appointment_city            = models.ForeignKey(City,blank=True,on_delete=models.DO_NOTHING)
@@ -142,7 +141,7 @@ class RowBooking(models.Model):
     appointment_gio_location    = models.CharField(max_length=30,blank=True,null=True)
     description                 = models.TextField(blank=True,null=True)
 
-    # check it --divakar --- appointment timimg is one or can be more than one
+    # check it appointment timimg is one or can be more than one
     # if one then add a field like below
 
     appointment_date           = models.DateField()
@@ -159,6 +158,9 @@ class RowBooking(models.Model):
     ispaymentadd               = models.BooleanField(default=False)
     paymentaddtime             = models.DateTimeField(blank=True,null=True)
 
+    def __str__(self):
+        return str(self.id)
+
 
 class LiveBooking(models.Model):
     '''
@@ -173,9 +175,13 @@ class LiveBooking(models.Model):
     status 
     1 = card added (live)
     2 = ReScheduled Appointments (in process)
-
     3 = task completed by provider not approval by requester
     4 = task completed approved by both
+    
+    # extra stuff 
+    on cancel appoint delete model from here
+
+
     '''
 
     booking_status     = models.CharField(max_length=5, blank=True,null=True)
@@ -186,7 +192,7 @@ class ReScheduledAppointments(models.Model):
     rowbooking_id           = models.ForeignKey(RowBooking ,on_delete=models.DO_NOTHING)
     re_scheduled_by         = models.ForeignKey(User,on_delete=models.CASCADE)
     re_scheduled_date       = models.DateTimeField(auto_now_add=True)
-    confirmed_by_opp        = models.BooleanField(default=False)
+    isconfirmed_by_opp      = models.BooleanField(default=False)# is confirmed by otherside
     confirmed_by_opp_date   = models.DateTimeField(blank=True,null=True)
 
     # which things is re-schedule 
@@ -198,20 +204,46 @@ class ReScheduledAppointments(models.Model):
         verbose_name_plural = "Re-Scheduled Appointments"
 
 
+class notification(models.Model):
+    notification_from       = models.ForeignKey(User ,on_delete=models.DO_NOTHING,related_name='notification_from')
+    notification_to         = models.ForeignKey(User ,on_delete=models.DO_NOTHING,related_name='notification_to')
+    isseen_by_opposite      = models.BooleanField(default=False)
+    created                 = models.DateTimeField(auto_now_add=True)
+    delieverd               = models.DateTimeField(blank=True,null=True)
+    isseen_opposite         = models.BooleanField(default=False)
+    seen_time               = models.DateTimeField(blank=True,null=True)
+
+
+    def __int__(self):
+        return self.rowbooking_id
+
+    class Meta:
+        verbose_name_plural = "Re-Scheduled Appointments"
+
+
+
+
+
+
+
+
 class CanceledBooking(models.Model):
     '''
     cancelled booking will come here
     '''
-    rowbooking_id       = models.ForeignKey(RowBooking ,on_delete=models.DO_NOTHING)
-    cancel_date         = models.DateTimeField(auto_now_add=True)
-    cancelled_by        = models.CharField(max_length=20)
+    rowbooking_id      = models.OneToOneField(RowBooking ,on_delete=models.DO_NOTHING)
+    canceled_by        = models.ForeignKey(User ,on_delete=models.DO_NOTHING)
+    cancel_date        = models.DateTimeField(auto_now_add=True)
+
+
+    
 
 
     def __int__(self):
-        return self.livebooking_id
+        return self.rowbooking_id
 
     class Meta:
-        verbose_name_plural = "Payment Methods"
+        verbose_name_plural = "Canceled Booking"
 
 class PaymentMethod(models.Model):
     '''

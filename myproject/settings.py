@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-
+import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -152,14 +152,13 @@ REST_FRAMEWORK = {
     # 'PAGE_SIZE': 100,
 
     'DEFAULT_PERMISSION_CLASSES': (
-        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         
-        
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',         
-       
+        'rest_framework.authentication.BasicAuthentication',            
 
     ),
     'DEFAULT_THROTTLE_CLASSES': (
@@ -170,6 +169,19 @@ REST_FRAMEWORK = {
     #     'anon': '200/day',
     #     'user': '200/day'
     # },
+}
+
+JWT_AUTH = {
+    # how long the original token is valid for
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=10),
+
+    # allow refreshing of tokens
+    'JWT_ALLOW_REFRESH': True,
+
+    # this is the maximum time AFTER the token was issued that
+    # it can be refreshed.  exprired tokens can't be refreshed.
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=2),
+    # 'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 }
 DEFAULT_FROM_EMAIL = 'dk5f1995@gmail.com'
 EMAIL_USE_TLS = True

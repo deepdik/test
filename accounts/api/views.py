@@ -110,7 +110,7 @@ from .socialserializer import  ModifiedSocialLoginSerializer
 class FacebookLoginView(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
     serializer_class=ModifiedSocialLoginSerializer
-    # authentication_classes = [JSONWebTokenAuthentication]
+    #authentication_classes = [JSONWebTokenAuthentication]
 
 
 class GoogleLoginView(SocialLoginView):

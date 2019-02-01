@@ -31,5 +31,5 @@ class ServiceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Service,ServiceAdmin)
-admin.site.register([Category,SubCategory,City])
+admin.site.register([Category,SubCategory,City,RowBooking,CanceledBooking])
 
